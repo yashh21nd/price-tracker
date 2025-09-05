@@ -1,16 +1,11 @@
-// routes/productRoutes.js
 const express = require("express");
 const { addProduct, getProducts } = require("../controllers/productController");
-
-console.log("Controllers loaded:", { addProduct, getProducts });
+const verifyToken = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Add a product
-router.post("/add", addProduct);
-
-// Get all products
-router.get("/", getProducts);
+// ✅ Only logged-in users can add or view products
+router.post("/add", verifyToken, addProduct);
+router.get("/", verifyToken, getProducts);
 
 module.exports = router;
-
