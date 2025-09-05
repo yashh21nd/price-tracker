@@ -18,12 +18,25 @@ const productRoutes = require("./routes/productRoutes");
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 
-// ✅ Import Cron Job (Price Updater)
-require("./cron/priceUpdater");
+// ✅ Root route
+app.get("/", (req, res) => {
+  res.send("✅ Price Tracker Backend is running!");
+});
+
+// ✅ Import Price Updater
+const { checkPrices } = require("./cron/priceUpdater");
+
+// ✅ Auto-run price check every 15 minutes
+setInterval(checkPrices, 15 * 60 * 1000);
+
+// ✅ Manual trigger for price update
+app.get("/api/check-prices", async (req, res) => {
+  await checkPrices();
+  res.json({ message: "✅ Price check complete" });
+});
 
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
